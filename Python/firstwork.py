@@ -1,3 +1,4 @@
+# function prime: find a prime
 def prime(n):
     k=0
     num=2
