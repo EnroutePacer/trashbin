@@ -3,6 +3,6 @@
 
 int main()
 {
-    prigntMessage("hhhiii,myfriend");
+    printMessage("hhhiii,myfriend");
     return 0;
 }  
