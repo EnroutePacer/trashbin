@@ -20,14 +20,14 @@ def uncompress(S):
                     n_change=2
                 else:
                     k*=int(S[slen-i])
- 
+
             tmp=k*S[slen-i+n_change:Ctrl[i_c]]
             change=(k-1)*len(S[slen-i+n_change:Ctrl[i_c]])-2-n_change
 
             if slen-i-2>0:
                 S=S[:slen-i-1] + tmp + S[Ctrl[i_c]+1:]
             else:
-                S=tmp
+                S=tmp + S[Ctrl[i_c]+1:]
 
             # 字符串处理引起 ] 原本下标改变
             Ctrl=[x+change for x in Ctrl]
