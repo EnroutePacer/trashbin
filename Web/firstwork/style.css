@@ -1,0 +1,414 @@
+/* 全局设定与色调：宽阔、协调、沉缓 */
+:root {
+    --ocean-deep: #114562;
+    --ocean-mid: #144878;
+    --ocean-light: #316786;
+    --text-primary: #e0f0f5;
+    --text-muted: #8ea8b5;
+    --accent: #5594b0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    background-color: var(--ocean-deep);
+    color: var(--text-primary);
+    line-height: 1.8;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* 导航 */
+.navbar {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 4rem;
+    background: rgba(5, 25, 35, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    transition: all 0.5s ease;
+}
+
+.navbar:hover {
+    background: rgba(5, 25, 35, 0.85);
+}
+
+.logo {
+    font-size: 1.6rem;
+    letter-spacing: 3px;
+    font-weight: 300;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: text-shadow 0.4s ease, color 0.4s ease, transform 0.4s ease;
+}
+
+.logo:hover {
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(85, 148, 176, 0.8);
+    transform: scale(1.02);
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 3.5rem;
+}
+
+.nav-links a {
+    position: relative;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    padding-bottom: 5px;
+    transition: color 0.4s ease;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: var(--accent);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.nav-links a:hover {
+    color: white;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+
+/* 首页横幅 */
+.hero {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.hero-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+.hero-text {
+    text-align: center;
+    animation: slowFadeIn 2s ease-in-out;
+}
+
+.hero-text h1 {
+    font-size: 4rem;
+    font-weight: normal;
+    letter-spacing: 5px;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+}
+
+.hero-text p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+}
+
+/* 章节公用 */
+.section-dark {
+    background-color: var(--ocean-deep);
+    padding: 6rem 4rem;
+}
+
+.section-light {
+    background-color: var(--ocean-mid);
+    padding: 6rem 4rem;
+}
+
+.section-title {
+    font-size: 2.2rem;
+    text-align: center;
+    font-weight: 300;
+    letter-spacing: 3px;
+    margin-bottom: 5rem;
+    color: rgb(201, 244, 254);
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 3rem;
+    font-style: italic;
+}
+
+/* 模块一：海洋知识 */
+.module-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6rem;
+}
+
+.module {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1.2s ease;
+}
+
+.module.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 潮汐侧边浮出特效 */
+.tide-slide {
+    transform: translateX(-100px);
+}
+.tide-slide.visible {
+    transform: translateX(0);
+    /* 配合潮汐一样的缓慢漂浮感 */
+    animation: tideFloat 6s ease-in-out infinite alternate;
+}
+
+@keyframes tideFloat {
+    0% { transform: translateY(0px) translateX(0px); }
+    100% { transform: translateY(-10px) translateX(5px); }
+}
+
+.module h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    font-weight: 400;
+    color: var(--accent);
+}
+
+.module p {
+    flex: 1;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    text-align: justify;
+}
+
+.module img {
+    flex: 1;
+    max-width: 50%;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    filter: brightness(0.8);
+    transition: filter 0.5s ease;
+}
+
+.module img:hover {
+    filter: brightness(1.1);
+}
+
+.module:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+/* 模块二：学术 */
+.academic-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.scholar-card, .paper-list, .official-links {
+    background: rgba(44, 94, 123, 0.1);
+    padding: 2.5rem;
+    border-radius: 4px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.scholar-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    filter: grayscale(1);
+    transition: filter 0.5s;
+}
+
+.scholar-card:hover img {
+    filter: grayscale(0.2);
+}
+
+.scholar-card h3, .paper-list h3, .official-links h3 {
+    color: var(--accent);
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    font-weight: 400;
+}
+
+.paper-list ul {
+    list-style: none;
+}
+
+.paper-list li {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.paper-list h4 {
+    font-weight: normal;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.paper-list p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.4s ease;
+    background: transparent;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn:hover {
+    background: var(--accent);
+    color: var(--ocean-deep);
+}
+
+.link-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* 交互区 */
+.interactive-part {
+    max-width: 900px;
+    margin: 0 auto 6rem;
+    text-align: center;
+}
+
+.upload-area {
+    background: rgba(255,255,255,0.02);
+    padding: 3rem;
+    border: 1px dashed var(--accent);
+    border-radius: 4px;
+}
+
+#ocean-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+#ocean-form input[type="text"] {
+    width: 80%;
+    padding: 1rem;
+    background: rgba(255,255,255,0.05);
+    border: none;
+    border-bottom: 1px solid var(--text-muted);
+    color: white;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+#ocean-form input:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+}
+
+.upload-btn {
+    cursor: pointer;
+    color: var(--accent);
+    text-decoration: underline;
+    font-style: italic;
+}
+
+.map-container {
+    height: 400px;
+    width: 100%;
+    border-radius: 4px;
+    margin-top: 2rem;
+    position: relative;
+    background: var(--ocean-mid);
+    border: 1px solid rgba(255,255,255,0.1);
+    /* 模拟云雾效果 */
+    position: relative;
+    overflow: hidden;
+}
+
+/* 占位云朵，配合JS模拟交互效果 */
+.simulated-cloud {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    cursor: crosshair;
+    transition: transform 0.3s;
+    z-index: 500;
+}
+.simulated-cloud:hover {
+    transform: scale(1.2);
+}
+
+.tooltip {
+    display: none;
+    position: absolute;
+    background: rgba(5, 25, 35, 0.9);
+    color: #fff;
+    padding: 0.8rem 1.2rem;
+    border-radius: 4px;
+    border: 1px solid var(--accent);
+    pointer-events: none;
+    font-size: 0.9rem;
+    z-index: 1000;
+    transition: opacity 0.3s;
+}
+
+footer {
+    text-align: center;
+    padding: 3rem;
+    background: #030e14;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+@keyframes slowFadeIn {
+    0% { opacity: 0; filter: blur(10px); }
+    100% { opacity: 1; filter: blur(0); }
+}
