@@ -7,21 +7,64 @@
     <link rel="stylesheet" href="style.css">
     <!-- 引入地图库用于交互 -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #page-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--ocean-deep);
+            z-index: 9999;
+            opacity: 1;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+
+        #page-transition.loaded {
+            opacity: 0;
+        }
+    </style>
 </head>
 <body>
+    <div id="page-transition"></div>
     <nav class="navbar">
-        <div class="logo">渊海微澜</div>
+        <div class="logo" data-i18n="nav.title">渊海微澜</div>
         <ul class="nav-links">
-            <li><a href="#knowledge">溯源</a></li>
-            <li><a href="#academic">求索</a></li>
-            <li><a href="#interactive">共境</a></li>
+            <li><a href="#knowledge" data-i18n="nav.knowledge">溯源</a></li>
+            <li><a href="#academic" data-i18n="nav.academic">求索</a></li>
+            <li><a href="#interactive" data-i18n="nav.interactive">共境</a></li>
         </ul>
+        <div class="settings-menu" id="settings-menu">
+            <div class="settings-btn" id="settings-btn">
+                <span>☰</span> <i class="arrow"></i>
+            </div>
+            <div class="settings-dropdown" id="settings-dropdown">
+                <div class="settings-dropdown-inner">
+                    <div class="dropdown-item">
+                        <span data-i18n="menu.theme">主题</span>
+                        <button id="theme-toggle" class="ctrl-btn-small">⚪</button>
+                    </div>
+                    <div class="dropdown-item">
+                        <span data-i18n="menu.lang">语言</span>
+                        <button id="lang-toggle" class="ctrl-btn-small">EN</button>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item">
+                        <a href="login.html" class="login-link" id="login-link">
+                            <span data-i18n="menu.login">登录</span>
+                            <span class="arrow-right">→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </nav>
 
-    <header class="hero">
+    <header class="hero no-select">
         <div class="hero-text">
-            <h1>湛蓝如梦，渊深不言</h1>
-            <p>一切生命起于此，一切浪潮归于斯。请随潮水，聆听海洋的呼吸。</p>
+            <h1 data-i18n="hero.title">Ocean</h1>
+            <p data-i18n="hero.desc">湛蓝如梦，渊深不言 . 请随潮水，聆听海洋的呼吸。</p>
         </div>
         <!-- 待填充图片
              全屏背景：深海中一缕阳光透射进来的幽蓝照片，极具典雅与神秘感 -->
@@ -30,13 +73,15 @@
 
     <!-- 区块一：海洋基础知识 -->
     <section id="knowledge" class="section-dark">
-        <h2 class="section-title">海之基——万物缘起</h2>
+        <h2 class="section-title" data-i18n="knowledge.title">海之基——万物缘起</h2>
         
         <div class="module-container">
             <!-- 模块一：侧边浮出潮汐效果 -->
             <div class="module tide-slide" id="module-1">
-                <h3>Our ocean, our ancestor</h3>
-                <p>在那远古的寂静中，水分子凝结成了最初的洋。千万年来，洋流如地球的血脉，奔腾不息，抚慰着每一寸大陆。这是洋的缘起，亦是生命的摇篮。</p>
+                <div class="module-text">
+                    <h3 data-i18n="knowledge.mod1.title">Our ocean, our ancestor</h3>
+                    <p data-i18n="knowledge.mod1.desc">在那远古的寂静中，水分子凝结成了最初的洋。千万年来，洋流如地球的血脉，奔腾不息，抚慰着每一寸大陆。这是洋的缘起，亦是生命的摇篮。</p>
+                </div>
                 <!-- 待填充图片
                      大洋洋流的概念图，带有一种宏伟的史诗感 -->
                 <img src="p_waves.jpg" alt="Ocean Currents">
@@ -44,8 +89,10 @@
 
             <!-- 模块二 -->
             <div class="module fade-in">
-                <h3>Live of ocean</h3>
-                <p>从微小的藻类在阳光下吐露第一口氧气，到五彩斑斓的珊瑚礁筑起海底的繁华城邦。他们是海洋中最沉默的基石，却孕育了最璀璨的生命交响。</p>
+                <div class="module-text">
+                    <h3 data-i18n="knowledge.mod2.title">Live of ocean</h3>
+                    <p data-i18n="knowledge.mod2.desc">从微小的藻类在阳光下吐露第一口氧气，到五彩斑斓的珊瑚礁筑起海底的繁华城邦。他们是海洋中最沉默的基石，却孕育了最璀璨的生命交响。</p>
+                </div>
                 <!-- 待填充图片
                      微距拍摄的美丽珊瑚礁或者泛着荧光的海洋微藻，色彩协调 -->
                 <img src="p_coral.jpg" alt="Marine Life">
@@ -53,8 +100,10 @@
 
             <!-- 模块三 -->
             <div class="module fade-in">
-                <h3>Crisis</h3>
-                <p>然而，这份深沉正在悲泣。白化的珊瑚如枯骨，塑料的漩涡窒息了波浪。温室的余热正在改变洋流的步调。深渊的危机，亦是人类的危机。</p>
+                <div class="module-text">
+                    <h3 data-i18n="knowledge.mod3.title">Crisis</h3>
+                    <p data-i18n="knowledge.mod3.desc">然而，这份深沉正在悲泣。白化的珊瑚如枯骨，塑料的漩涡窒息了波浪。温室的余热正在改变洋流的步调。深渊的危机，亦是人类的危机。</p>
+                </div>
                 <!-- 待填充图片
                      展现海洋环境危机的艺术照片，如一只被困的海洋生物或褪色的珊瑚，具有哀伤的悲剧美 -->
                 <img src="p_polution.jpg" alt="Ocean Crisis">
@@ -64,34 +113,34 @@
 
     <!-- 区块二：学术讨论区域 -->
     <section id="academic" class="section-light">
-        <h2 class="section-title">海之理——智者之思</h2>
+        <h2 class="section-title" data-i18n="academic.title">海之理——智者之思</h2>
         
         <div class="academic-grid">
             <div class="scholar-card">
                 <!-- 待填充图片
                      大卫·爱登堡（David Attenborough）的肖像，黑白或复古色调 -->
                 <img src="OIP.jpg" alt="David Attenborough">
-                <h3>大卫·爱登堡与他的蓝星</h3>
-                <p>“我们必须停止破坏，开始修复。”探讨海洋在调节全球气候中的不可替代性及物种多样性的守护准则。</p>
-                <a href="#" class="read-more">阅读文摘</a>
+                <h3 data-i18n="academic.scholar.title">大卫·爱登堡与他的蓝星</h3>
+                <p data-i18n="academic.scholar.desc">“我们必须停止破坏，开始修复。”探讨海洋在调节全球气候中的不可替代性及物种多样性的守护准则。</p>
+                <a href="#" class="read-more" data-i18n="academic.scholar.readMore">阅读文摘</a>
             </div>
 
             <div class="paper-list">
-                <h3>探讨与洞见</h3>
+                <h3 data-i18n="academic.papers.title">探讨与洞见</h3>
                 <ul>
                     <li>
-                        <h4>洋流停滞：北大西洋暖流的未来趋势</h4>
-                        <p>预测模型与气候连锁反应分析...</p>
+                        <h4 data-i18n="academic.papers.p1.title">洋流停滞：北大西洋暖流的未来趋势</h4>
+                        <p data-i18n="academic.papers.p1.desc">预测模型与气候连锁反应分析...</p>
                     </li>
                     <li>
-                        <h4>深海碳泵：微藻如何锁住所吸之气</h4>
-                        <p>关于碳固存效率的重新评估...</p>
+                        <h4 data-i18n="academic.papers.p2.title">深海碳泵：微藻如何锁住所吸之气</h4>
+                        <p data-i18n="academic.papers.p2.desc">关于碳固存效率的重新评估...</p>
                     </li>
                 </ul>
             </div>
             
             <div class="official-links">
-                <h3>权威数据链接</h3>
+                <h3 data-i18n="academic.links.title">权威数据链接</h3>
                 <div class="link-buttons">
                     <a href="https://ocean.si.edu/" target="_blank" class="btn">Smithsonian Ocean</a>
                     <a href="https://www.noaa.gov/ocean" target="_blank" class="btn">NOAA Ocean</a>
@@ -103,19 +152,19 @@
 
     <!-- 区块三：交互式海洋体验 -->
     <section id="interactive" class="section-dark">
-        <h2 class="section-title">海之境——天涯共此波</h2>
+        <h2 class="section-title" data-i18n="interactive.title">海之境——天涯共此波</h2>
         
         <!-- 一：共享海洋地图 -->
         <div class="interactive-part">
-            <h3>落位与留影 —— 共享您的海洋印记</h3>
-            <p class="subtitle">在世界的某一处海岸，您曾留下怎样的波光？</p>
+            <h3 data-i18n="interactive.p1.title">落位与留影 —— 共享您的海洋印记</h3>
+            <p class="subtitle" data-i18n="interactive.p1.desc">在世界的某一处海岸，您曾留下怎样的波光？</p>
             <div class="upload-area">
                 <form id="ocean-form">
-                    <input type="text" id="location" placeholder="输入坐标或地名，如：Iceland 黑沙滩" required>
-                    <label for="photo-upload" class="upload-btn">选择您的海洋照片</label>
+                    <input type="text" id="location" data-i18n-placeholder="interactive.placeholder" placeholder="输入坐标或地名，如：Iceland 黑沙滩" required>
+                    <label for="photo-upload" class="upload-btn" data-i18n="interactive.uploadBtn">选择您的海洋照片</label>
                     <input type="file" id="photo-upload" accept="image/*" style="display:none;" required>
-                    <div id="file-name">未选择文件</div>
-                    <button type="submit" class="btn btn-submit">汇入渊海</button>
+                    <div id="file-name" data-i18n="interactive.noFile">未选择文件</div>
+                    <button type="submit" class="btn btn-submit" data-i18n="interactive.submit">汇入渊海</button>
                     <!-- 注释：此处为前端展示框。实际的后端应接收 multipart/form-data，存储图片至如 S3 等对象存储，并将地理坐标、图片URL和时间戳写入数据库（如 PostgreSQL），供地图实时拉取渲染。 -->
                 </form>
             </div>
@@ -123,8 +172,8 @@
 
         <!-- 二：气象与水汽溯源地图 -->
         <div class="interactive-part weather-map-section">
-            <h3>云之乡 —— 水汽溯源幻境</h3>
-            <p class="subtitle">悬停于积雨云上，聆听是从哪个大洋升腾的叹息。（体验版）</p>
+            <h3 data-i18n="interactive.p2.title">云之乡 —— 水汽溯源幻境</h3>
+            <p class="subtitle" data-i18n="interactive.p2.desc">悬停于积雨云上，聆听是从哪个大洋升腾的叹息。（体验版）</p>
             <div id="weather-map" class="map-container">
                 <!-- 地图将由 Leaflet.js 渲染 -->
             </div>
@@ -133,7 +182,7 @@
     </section>
 
     <footer>
-        <p>长川静流，沧海不言。 | &copy; 2026 渊海微澜</p>
+        <p data-i18n="footer.text">长川静流，沧海不言。 | &copy; 2026 渊海微澜</p>
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

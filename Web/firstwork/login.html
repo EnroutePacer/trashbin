@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .login-page {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+            overflow: hidden;
+            position: relative;
+        }
+
+        .login-container {
+            background: var(--bg-overlay);
+            backdrop-filter: blur(20px);
+            padding: 3rem 4rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+            animation: slowFadeIn 1.5s ease;
+            z-index: 2;
+        }
+
+        .login-container h2 {
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: var(--title-color);
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(85, 148, 176, 0.5);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.8rem;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        /* 页面跳转遮罩 */
+        #page-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--ocean-deep);
+            z-index: 9999;
+            opacity: 1;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+
+        #page-transition.loaded {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="page-transition"></div>
+    
+    <div class="login-page">
+        <div class="login-container">
+            <h2>用户登录</h2>
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn login-btn">登录</button>
+            </form>
+            <a href="index.html" class="back-link">← 返回首页</a>
+        </div>
+    </div>
+
+    <!-- 简单的页面过渡与语言逻辑复用脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 页面淡入
+            const transition = document.getElementById('page-transition');
+            setTimeout(() => {
+                transition.classList.add('loaded');
+            }, 100);
+
+            // 登录模拟
+            document.getElementById('login-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('登录成功！');
+                // 模拟跳转回首页的平湖过渡
+                transition.classList.remove('loaded');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 800);
+            });
+
+            // 拦截返回链接进行平滑过渡
+            document.querySelector('.back-link').addEventListener('click', (e) => {
+                e.preventDefault();
+                transition.classList.remove('loaded');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 800);
+            });
+        });
+    </script>
+</body>
+</html>
