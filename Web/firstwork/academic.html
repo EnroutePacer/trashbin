@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>渊海微澜 - Academic</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #page-transition {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--ocean-deep); z-index: 9999; opacity: 1; pointer-events: none; transition: opacity 0.8s ease;
+        }
+        #page-transition.loaded { opacity: 0; }
+        .academic-page-spacer { padding-top: 120px; background-color: var(--ocean-deep); transition: background-color 0.5s ease; }
+        .academic-container { max-width: 1000px; margin: 0 auto; padding: 0 2rem; }
+        .paper-card-large {
+            background: var(--bg-overlay); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;
+            border-left: 5px solid var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: transform 0.3s;
+        }
+        .paper-card-large:hover { transform: translateX(10px); }
+        .paper-card-large h4 { font-size: 1.5rem; color: var(--title-color); margin-bottom: 1rem; }
+        .paper-card-large p { color: var(--text-primary); line-height: 1.8; margin-bottom: 1rem; text-align: justify; }
+        .paper-card-large .author { color: var(--text-muted); font-style: italic; font-size: 0.9rem; text-align: right; }
+        
+        .portal-links { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+        .portal-btn {
+            display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--accent); border-radius: 8px;
+            color: var(--text-primary); text-decoration: none; font-size: 1.1rem; transition: all 0.3s; text-align: center;
+        }
+        .portal-btn:hover { background: var(--accent); color: #fff; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+    </style>
+
+    <script>
+        (function() {
+            var theme = localStorage.getItem('siteTheme');
+            if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+            var lang = localStorage.getItem('siteLang');
+            if(lang) {
+                document.documentElement.lang = lang;
+            }
+        })();
+    </script>
+</head>
+<body>
+    
+    <div id="page-transition"></div>
+    <nav class="navbar">
+        <a href="index.html" style="text-decoration: none;"><div class="logo" data-i18n="nav.title">渊海微澜</div></a>
+        <ul class="nav-links">
+            <!-- 中间的跳转被移除了，按照要求 -->
+        </ul>
+        <div class="settings-menu" id="settings-menu">
+            <div class="settings-btn" id="settings-btn">
+                <span>☰</span> <i class="arrow"></i>
+            </div>
+            <div class="settings-dropdown" id="settings-dropdown">
+                <div class="settings-dropdown-inner">
+                    <div class="dropdown-item">
+                        <span data-i18n="menu.theme">主题</span>
+                        <button id="theme-toggle" class="ctrl-btn-small">⚪</button>
+                    </div>
+                    <div class="dropdown-item">
+                        <span data-i18n="menu.lang">语言</span>
+                        <button id="lang-toggle" class="ctrl-btn-small">EN</button>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item">
+                        <a href="knowledge.html" class="login-link">
+                            <span data-i18n="nav.dropdown.knowledge">知识谱系</span>
+                            <span class="arrow-right">→</span>
+                        </a>
+                    </div>
+                    <div class="dropdown-item">
+                        <a href="academic.html" class="login-link">
+                            <span data-i18n="nav.dropdown.academic">学术长廊</span>
+                            <span class="arrow-right">→</span>
+                        </a>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item">
+                        <a href="login.html" class="login-link" id="login-link">
+                            <span data-i18n="menu.login">登录</span>
+                            <span class="arrow-right">→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="academic-page-spacer"></div>
+
+    <section class="section-dark" style="padding-top: 4rem; padding-bottom: 6rem; min-height: 100vh;">
+        <h1 class="section-title" data-i18n="page.academic.header" style="font-size: 3rem; margin-bottom: 4rem;">长廊：学术与洞察</h1>
+        
+        <div class="academic-container">
+            
+            <!-- 文献部分 -->
+            <div style="margin-bottom: 5rem;" class="tide-slide">
+                <h3 data-i18n="page.academic.section1.title" style="font-size: 2rem; border-bottom: 1px solid var(--accent); padding-bottom: 10px; margin-bottom: 2rem; color: var(--title-color);">学术讨论与海洋文献研究</h3>
+                
+                <div class="paper-card-large">
+                    <h4 data-i18n="page.academic.paper1.title">《The Ocean's role in Global Climate system》</h4>
+                    <p data-i18n="page.academic.paper1.desc">系统探讨...</p>
+                    <div class="author" data-i18n="page.academic.paper1.author">Smith J., et al. (2020)</div>
+                </div>
+                
+                <div class="paper-card-large">
+                    <h4 data-i18n="page.academic.paper2.title">《Ocean Acidification and Coral Reef Ecosystems》</h4>
+                    <p data-i18n="page.academic.paper2.desc">一项为期十年的长期观察报告...</p>
+                    <div class="author" data-i18n="page.academic.paper2.author">Williams & Taylor (2018)</div>
+                </div>
+                
+                <div class="paper-card-large">
+                    <h4 data-i18n="page.academic.paper3.title">《Marine Microplastics: Risks and Bioaccumulation》</h4>
+                    <p data-i18n="page.academic.paper3.desc">全面追踪和测定了跨越多个大洋...</p>
+                    <div class="author" data-i18n="page.academic.paper3.author">Nature Environment Review (2022)</div>
+                </div>
+            </div>
+
+            <!-- 学者部分 -->
+            <div style="margin-bottom: 5rem;" class="tide-slide">
+                <h3 data-i18n="page.academic.section2.title" style="font-size: 2rem; border-bottom: 1px solid var(--accent); padding-bottom: 10px; margin-bottom: 2rem; color: var(--title-color);">先驱学者与倡导人物</h3>
+                
+                <div class="scholar-card" style="display: flex; align-items: center; gap: 2rem; text-align: left; padding: 2rem; border-radius: 12px; background: var(--bg-overlay); flex-wrap: wrap;">
+                    <img src="OIP.jpg" alt="Scholar Portrait" style="width: 200px; height: 250px; border-radius: 8px; object-fit: cover;">
+                    <div style="flex: 1;">
+                        <h3 data-i18n="page.academic.scholar.name" style="font-size: 1.8rem; margin-bottom: 1rem; color: var(--highlight);">大卫·爱登堡 (David Attenborough)</h3>
+                        <p data-i18n="page.academic.scholar.desc" style="font-size: 1.1rem; line-height: 1.8; color: var(--text-primary); text-align: justify;">“如果没有海洋...”</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 传送门部分 -->
+            <div class="tide-slide">
+                <h3 data-i18n="page.academic.section3.title" style="font-size: 2rem; border-bottom: 1px solid var(--accent); padding-bottom: 10px; margin-bottom: 2rem; color: var(--title-color);">海洋官方数据与统计门户入口</h3>
+                
+                <div class="portal-links">
+                    <a href="https://www.noaa.gov/" target="_blank" class="portal-btn" data-i18n="page.academic.link1">NOAA 全球环境数据中心</a>
+                    <a href="https://www.ipcc.ch/" target="_blank" class="portal-btn" data-i18n="page.academic.link2">IPCC 气候变化专门委员会</a>
+                    <a href="https://www.marinespecies.org/" target="_blank" class="portal-btn" data-i18n="page.academic.link3">世界海洋物种名录 (WoRMS)</a>
+                    <a href="https://www.iucnredlist.org/" target="_blank" class="portal-btn" data-i18n="page.academic.link4">IUCN 红色名录海洋保护区统计</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p data-i18n="footer.text">© 2026 渊海微澜. 保留所有权利. | 让深蓝不息流淌</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

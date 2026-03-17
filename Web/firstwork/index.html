@@ -25,11 +25,24 @@
             opacity: 0;
         }
     </style>
+
+    <script>
+        (function() {
+            var theme = localStorage.getItem('siteTheme');
+            if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+            var lang = localStorage.getItem('siteLang');
+            if(lang) {
+                document.documentElement.lang = lang;
+            }
+        })();
+    </script>
 </head>
 <body>
     <div id="page-transition"></div>
     <nav class="navbar">
-        <div class="logo" data-i18n="nav.title">渊海微澜</div>
+        <a href="index.html" style="text-decoration: none;"><div class="logo" data-i18n="nav.title">渊海微澜</div></a>
         <ul class="nav-links">
             <li><a href="#knowledge" data-i18n="nav.knowledge">溯源</a></li>
             <li><a href="#academic" data-i18n="nav.academic">求索</a></li>
@@ -48,6 +61,19 @@
                     <div class="dropdown-item">
                         <span data-i18n="menu.lang">语言</span>
                         <button id="lang-toggle" class="ctrl-btn-small">EN</button>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item">
+                        <a href="knowledge.html" class="login-link">
+                            <span data-i18n="nav.dropdown.knowledge">知识谱系</span>
+                            <span class="arrow-right">→</span>
+                        </a>
+                    </div>
+                    <div class="dropdown-item">
+                        <a href="academic.html" class="login-link">
+                            <span data-i18n="nav.dropdown.academic">学术长廊</span>
+                            <span class="arrow-right">→</span>
+                        </a>
                     </div>
                     <div class="dropdown-divider"></div>
                     <div class="dropdown-item">
