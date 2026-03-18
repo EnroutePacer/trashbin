@@ -1,4 +1,4 @@
-/* 全局设定与色调：宽阔、协调、沉缓 */
+/* 鍏ㄥ眬璁惧畾涓庤壊璋冿細瀹介様銆佸崗璋冦€佹矇缂?*/
 :root {
     --ocean-deep: #114562;
     --ocean-mid: #144878;
@@ -27,6 +27,23 @@
     --footer-bg: #b5cddb;
 }
 
+/* 确保浅色模式下，暗色顶栏上的文字和按钮仍保持浅色可见 */
+[data-theme='light'] .navbar .logo,
+[data-theme='light'] .navbar .settings-btn {
+    color: #e0f0f5;
+}
+[data-theme='light'] .navbar .nav-links a {
+    color: #e0f0f5; /* changed to e0f0f5 completely instead of 8ea8b5 to increase visibility */
+}
+[data-theme='light'] .navbar .logo:hover,
+[data-theme='light'] .navbar .nav-links a:hover {
+    color: #ffffff;
+}
+[data-theme='light'] .settings-btn .arrow {
+    border-top-color: #e0f0f5;
+}
+
+
 * {
     margin: 0;
     padding: 0;
@@ -44,14 +61,14 @@ body {
 }
 
 .no-select {
-    user-select: none;      /* 禁止选中 */
+    user-select: none;      /* 绂佹閫変腑 */
     -webkit-user-select: none;
     -moz-user-select: none;
     cursor: default;        
 }
 
 
-/* 导航 */
+/* 瀵艰埅 */
 .navbar {
     position: fixed;
     width: 100%;
@@ -60,7 +77,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem 4rem;
-    background: rgba(5, 25, 35, 0.4);
+    background: rgba(5, 25, 35, 0.7);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -70,7 +87,7 @@ body {
 }
 
 .navbar:hover {
-    background: rgba(5, 25, 35, 0.85);
+    background: rgba(5, 25, 35, 0.8);
 }
 
 .settings-menu {
@@ -270,7 +287,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* 首页横幅 */
+/* 棣栭〉妯箙 */
 .hero {
     position: relative;
     height: 100vh;
@@ -313,7 +330,7 @@ body {
     text-shadow: 0 2px 10px rgba(0,0,0,0.6);
 }
 
-/* 章节公用 */
+/* 绔犺妭鍏敤 */
 .section-dark {
     background-color: var(--ocean-deep);
     padding: 6rem 4rem;
@@ -377,7 +394,7 @@ body {
     letter-spacing: 1px;
 }
 
-/* 模块一：海洋知识 */
+/* 妯″潡涓€锛氭捣娲嬬煡璇?*/
 .module-container {
     max-width: 1100px;
     margin: 0 auto;
@@ -400,13 +417,13 @@ body {
     transform: translateY(0);
 }
 
-/* 潮汐侧边浮出特效 */
+/* 娼睈渚ц竟娴嚭鐗规晥 */
 .tide-slide {
     transform: translateX(-100px);
 }
 .tide-slide.visible {
     transform: translateX(0);
-    /* 配合潮汐一样的缓慢漂浮感 */
+    /* 閰嶅悎娼睈涓€鏍风殑缂撴參婕傛诞鎰?*/
     animation: tideFloat 6s ease-in-out infinite alternate;
 }
 
@@ -455,7 +472,7 @@ body {
     flex-direction: row-reverse;
 }
 
-/* 模块二：学术 */
+/* 妯″潡浜岋細瀛︽湳 */
 .academic-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -584,7 +601,7 @@ body {
     gap: 1rem;
 }
 
-/* 交互区 */
+/* 浜や簰鍖?*/
 .interactive-part {
     max-width: 900px;
     margin: 0 auto 6rem;
@@ -662,12 +679,12 @@ body {
     position: relative;
     background: var(--ocean-mid);
     border: 1px solid rgba(255,255,255,0.1);
-    /* 模拟云雾效果 */
+    /* 妯℃嫙浜戦浘鏁堟灉 */
     position: relative;
     z-index: 1; /* Fix Map stacking formatting */
 }
 
-/* 占位云朵，配合JS模拟交互效果 */
+/* 鍗犱綅浜戞湹锛岄厤鍚圝S妯℃嫙浜や簰鏁堟灉 */
 .simulated-cloud {
     position: absolute;
     width: 80px;
@@ -711,16 +728,30 @@ footer {
     100% { opacity: 1; filter: blur(0); }
 }
 
-/* 响应式设计 - 移动端适配 */
+/* 鍝嶅簲寮忚璁?- 绉诲姩绔€傞厤 */
 @media (max-width: 768px) {
     .navbar {
-        flex-direction: column;
-        padding: 1rem;
-        gap: 1rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 0.8rem 1.2rem;
+        gap: 0.5rem;
     }
-    
+
+    .logo {
+        font-size: 1.2rem;
+    }
+
     .nav-links {
-        gap: 1.5rem;
+        width: 100%;
+        justify-content: center;
+        gap: 1.2rem;
+        order: 3;
+        margin-top: 0.2rem;
+    }
+
+    .nav-links a {
+        font-size: 0.95rem;
     }
 
     .hero-text h1 {
@@ -776,6 +807,10 @@ footer {
     
     .map-container {
         height: 300px;
+    }
+
+    .settings-btn .arrow {
+        display: none;
     }
 }
 
