@@ -1,4 +1,4 @@
-/* 鍏ㄥ眬璁惧畾涓庤壊璋冿細瀹介様銆佸崗璋冦€佹矇缂?*/
+/* 全局基础色彩与变量设定 */
 :root {
     --ocean-deep: #114562;
     --ocean-mid: #144878;
@@ -60,15 +60,16 @@ body {
     transition: background-color 0.5s ease, color 0.5s ease;
 }
 
+/* 阻止文本被选中 */
 .no-select {
-    user-select: none;      /* 绂佹閫変腑 */
+    user-select: none;      
     -webkit-user-select: none;
     -moz-user-select: none;
     cursor: default;        
 }
 
 
-/* 瀵艰埅 */
+/* 顶部大导航栏样式 */
 .navbar {
     position: fixed;
     width: 100%;
@@ -287,7 +288,8 @@ body {
     transform: translateY(-2px);
 }
 
-/* 棣栭〉妯箙 */
+
+/* 首页首屏主视觉横幅 */
 .hero {
     position: relative;
     height: 100vh;
@@ -330,7 +332,7 @@ body {
     text-shadow: 0 2px 10px rgba(0,0,0,0.6);
 }
 
-/* 绔犺妭鍏敤 */
+/* 深浅两色页面区块的通用样式 */
 .section-dark {
     background-color: var(--ocean-deep);
     padding: 6rem 4rem;
@@ -394,7 +396,8 @@ body {
     letter-spacing: 1px;
 }
 
-/* 妯″潡涓€锛氭捣娲嬬煡璇?*/
+
+/* 版块一：核心海量知识架构图文区 */
 .module-container {
     max-width: 1100px;
     margin: 0 auto;
@@ -417,13 +420,14 @@ body {
     transform: translateY(0);
 }
 
-/* 娼睈渚ц竟娴嚭鐗规晥 */
+
+/* 控制内容的侧边潮汐式切入浮现动画 */
 .tide-slide {
     transform: translateX(-100px);
 }
 .tide-slide.visible {
     transform: translateX(0);
-    /* 閰嶅悎娼睈涓€鏍风殑缂撴參婕傛诞鎰?*/
+    /* 挂载动画模拟潮汐海水的上下浮动感 */
     animation: tideFloat 6s ease-in-out infinite alternate;
 }
 
@@ -472,7 +476,7 @@ body {
     flex-direction: row-reverse;
 }
 
-/* 妯″潡浜岋細瀛︽湳 */
+/* 内容区：学术模块 */
 .academic-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -601,7 +605,7 @@ body {
     gap: 1rem;
 }
 
-/* 浜や簰鍖?*/
+/* 交互内容区 */
 .interactive-part {
     max-width: 900px;
     margin: 0 auto 6rem;
@@ -679,12 +683,12 @@ body {
     position: relative;
     background: var(--ocean-mid);
     border: 1px solid rgba(255,255,255,0.1);
-    /* 妯℃嫙浜戦浘鏁堟灉 */
+    /* 模拟云雾效果 */
     position: relative;
     z-index: 1; /* Fix Map stacking formatting */
 }
 
-/* 鍗犱綅浜戞湹锛岄厤鍚圝S妯℃嫙浜や簰鏁堟灉 */
+/* 占位云朵，用于配合JS触发互动特效 */
 .simulated-cloud {
     position: absolute;
     width: 80px;
@@ -728,7 +732,7 @@ footer {
     100% { opacity: 1; filter: blur(0); }
 }
 
-/* 鍝嶅簲寮忚璁?- 绉诲姩绔€傞厤 */
+/* 响应式设计：移动端竖屏适配 */
 @media (max-width: 768px) {
     .navbar {
         flex-direction: row;
