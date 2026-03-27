@@ -4,7 +4,7 @@
 		{
 			"type": "cppbuild",
 			"label": "C/C++: g++.exe build active file",
-			"command": "D:\\MinGW\\ucrt64\\bin\\g++.exe",
+			"command": "D:\\Msys2\\ucrt64\\bin\\g++.exe",
 			"args": [
 				"-fdiagnostics-color=always",
 				"-g",
@@ -19,7 +19,7 @@
 				"$gcc"
 			],
 			"group": "build",
-			"detail": "compiler: D:\\MinGW\\ucrt64\\bin\\g++.exe"
+			"detail": "compiler: D:\\Msys2\\ucrt64\\bin\\g++.exe"
 		}
 	]
 }

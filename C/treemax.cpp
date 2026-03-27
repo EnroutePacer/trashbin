@@ -5,6 +5,7 @@
 
 using namespace std;
 
+// 二分比较
 int binary_cp(vector<int> a,int start,int end)
 {
     if(start==end) 

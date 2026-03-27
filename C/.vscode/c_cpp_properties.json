@@ -3,14 +3,20 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "D:/Msys2/ucrt64/include",
+                "D:/Msys2/ucrt64/include/c++/15.2.0",
+                "D:/Msys2/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32",
+                "D:/Msys2/ucrt64/include/c++/15.2.0/backward",
+                "D:/Msys2/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include",
+                "D:/Msys2/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include-fixed"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "D:\\MinGW\\ucrt64\\bin\\gcc.exe",
+            "compilerPath": "D:\\Msys2\\ucrt64\\bin\\g++.exe",
             "cStandard": "c17",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "windows-gcc-x64"
