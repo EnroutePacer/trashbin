@@ -2,8 +2,7 @@
 
 // 单例的创建（static 用法）
 
-// 
-
+// 重载运算符
 
 #include <iostream>
 #include <vector>
@@ -17,13 +16,14 @@ private:
     std::string gender;
 
 public:
-    person(int a,std::string b): age(a),gender(b) {}
-    
+    // 用重载函数初始化，应对多种情况
+    person(): age(-1), gender("Unknown") {} // 默认构造函数
+    person(int a,std::string b): age(a), gender(b) {} // 传参构造函数
+
     // 前面的 const 限制使用者利用 ref 特性修改返回值，从而影响私有变量
 
     // 后面的 const 规定方法内变量不能被修改，
     // 并将返回值的 this 指针变为 const 类型，使得 main 函数里的 const 对象可以调用方法
-
     const int& getage() const{
         return age;
     }
@@ -37,6 +37,17 @@ public:
         return age;
     }
 };
+
+// 重载运算符 (极大简化代码操作)
+std::ostream& operator<<(std::ostream& s, const person& sb)
+{
+    s << sb.getage() << ", " << sb.getgender() << std::endl;
+    return s;
+}
+bool operator==(const person& a, const person& b)
+{
+    return (a.getage()==b.getage() && a.getgender()==b.getgender());
+}
 
 // 单例
 class singleton
@@ -79,7 +90,9 @@ int main(void)
 {
     const person Mike(13,"Male"); // const 对象在调用方法时，只能用 const 修饰过的方法
     int year_pass = 5;
-    std::cout << Mike.growup(year_pass) <<" "<< Mike.getgender() << std::endl;
+
+    std::cout << Mike; // 调用重载运算符
+    std::cout << Mike.growup(year_pass) <<", "<< Mike.getgender() << std::endl;
 
     singleton::GetOne().Claim();
     singleton::GetOne().SetLevel(1);
