@@ -60,6 +60,18 @@ public:
         static singleton TheOne;
         return TheOne;
     }
+    class autodelete
+    {
+    public:
+        ~autodelete(){
+            if(singleton::level != nullptr){
+                delete singleton::level;
+                singleton::level = nullptr;
+            }
+        };
+    };
+    static autodelete deleter;
+    
 
     void Claim()
     {
@@ -100,5 +112,6 @@ int main(void)
     singleton::GetOne().Log();
 
     std::cin.get();
+    
     return 0;
 }
