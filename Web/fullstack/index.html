@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vue + FastAPI</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h2>{{ title }}</h2>
+
+    <button @click="fetchData">请求后端</button>
+
+    <p v-if="msg">后端返回：{{ msg }}</p>
+    
+    <button @click="clearData">清空对话</button>
+
+  </div>
+
+  <script>
+    const app = Vue.createApp({
+      data() {
+        return {
+          title: "Vue + FastAPI",
+          msg: ""
+        }
+      },
+      methods: {
+        async fetchData() {
+          const res = await fetch("http://127.0.0.1:8000/api/hello")
+          const data = await res.json()
+          this.msg = data.message
+        },
+        clearData() {
+          this.msg = ""  
+        }
+
+      }
+    })
+    app.mount("#app")
+  </script>
+</body>
+</html>
