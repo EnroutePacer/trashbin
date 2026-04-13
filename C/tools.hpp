@@ -1,7 +1,9 @@
 #include <iostream>
+#include <vector>
+
 class Entity
 {
-private:
+protected:
     static int count;
     int ID;
 public:
@@ -13,9 +15,23 @@ public:
     }
     Entity();
     Entity(int x, int y);
-    ~Entity();
+    virtual ~Entity();
 };
+
+class MagnetEntity : public Entity
+{
+public:
+    int range;
+
+    MagnetEntity();
+    MagnetEntity(int x, int y, int range);
+    ~MagnetEntity();
+};
+
+
 
 
 void printEntity(Entity& a);
 Entity operator+(Entity& a, Entity& b);
+
+void ActivateMagnet(std::vector<Entity*>& v);

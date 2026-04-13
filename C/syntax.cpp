@@ -1,8 +1,8 @@
-// 类的基本用法，const 修饰类内方法
+// 1. 类的基本用法，const 修饰类内方法
 
-// 单例的创建（static 用法）
+// 2. 单例的创建（static 用法）
 
-// 重载运算符
+// 3. 重载运算符
 
 #include <iostream>
 #include <vector>
@@ -20,9 +20,11 @@ public:
     person(): age(-1), gender("Unknown") {} // 默认构造函数
     person(int a,std::string b): age(a), gender(b) {} // 传参构造函数
 
-    // 前面的 const 限制使用者利用 ref 特性修改返回值，从而影响私有变量
 
-    // 后面的 const 规定方法内变量不能被修改，
+    // 前面的 const 修饰返回值，
+    // 限制使用者利用 ref 特性修改返回值，从而影响私有变量
+
+    // 后面的 const 修饰方法内变量，
     // 并将返回值的 this 指针变为 const 类型，使得 main 函数里的 const 对象可以调用方法
     const int& getage() const{
         return age;
@@ -49,6 +51,7 @@ bool operator==(const person& a, const person& b)
     return (a.getage()==b.getage() && a.getgender()==b.getgender());
 }
 
+
 // 单例
 class singleton
 {
@@ -60,6 +63,8 @@ public:
         static singleton TheOne;
         return TheOne;
     }
+
+    // 回收器
     class autodelete
     {
     public:
@@ -70,6 +75,7 @@ public:
             }
         };
     };
+    // 在类内创建一个回收器，自动回收 static 对象 new 出来的内存
     static autodelete deleter;
     
 
@@ -95,7 +101,7 @@ public:
     }
 };
 
-int* singleton::level=new int; // 静态变量必须在类外初始化
+int* singleton::level=new int; // 静态变量不会自动拥有内存，必须手动在类外初始化
 
 
 int main(void)
