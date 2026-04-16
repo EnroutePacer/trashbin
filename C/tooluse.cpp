@@ -21,18 +21,20 @@ int main()
         std::cin.get();
     }
 
-
     std::vector<Entity*> v;
+    // 类型必须是指针，先在堆上创建对象，再把相应的指针 push 进去
+    // 直接把栈上的对象 push 进去会导致派生类被切片
     v.push_back(new Entity(5,6));
     v.push_back(new Entity(1,2));
     v.push_back(new MagnetEntity(1,1,1));
     v.push_back(new Entity(3,2));
+    
+    // 集成函数指针、Lambda 调用、类型转换
+    ForEach(v, [](Entity* me) { printEntity(*me); });
 
     ActivateMagnet(v);
 
-    for(auto me : v){
-        printEntity(*me);
-    }
+    ForEach(v, [](Entity* me) { printEntity(*me); });
 
 
     for(auto me : v){

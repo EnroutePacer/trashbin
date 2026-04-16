@@ -28,10 +28,15 @@ public:
     ~MagnetEntity();
 };
 
-
-
+template<typename T, typename F>
+void ForEach(std::vector<T>& v, F func) {
+    for (auto elem : v) {
+        func(elem);
+    }
+}
 
 void printEntity(Entity& a);
+
 Entity operator+(Entity& a, Entity& b);
 
 void ActivateMagnet(std::vector<Entity*>& v);
