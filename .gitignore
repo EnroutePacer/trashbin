@@ -1,0 +1,30 @@
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# C / C++ 
+*.exe
+*.o
+*.obj
+*.out
+*.dll
+*.lib
+*.pdb
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+.env
+
+# Web / Node / Vite
+node_modules/
+dist/
+dist-ssr/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
