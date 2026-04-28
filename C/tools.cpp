@@ -33,7 +33,8 @@ MagnetEntity::MagnetEntity(){
     this->range = 0;
 }
 
-/* 子类构造函数应当先调用父类，否则会造成重复构造元素
+/* 子类构造函数应当先显式调用父类带参构造函数
+    若没有显式调用，会调用父类默认构造函数，会造成重复构造元素
    （此处的结果是 ID 生成了两次）
 
 MagnetEntity::MagnetEntity(int x, int y, int range){

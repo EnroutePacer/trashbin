@@ -2,12 +2,15 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include "Timer.hpp"
 
 using namespace std;
 
 // 二分比较
-int binary_cp(vector<int> a,int start,int end)
+int binary_cp(vector<int> a, int start, int end)
 {
+    Timer timer;
+
     if(start==end) 
         return a[start];
     else{
@@ -31,7 +34,7 @@ int main()
         a.push_back(num);
     }
     
-    int max = binary_cp(a,0,(int)a.size()-1);
+    int max = binary_cp(a, 0, (int)a.size()-1);
     cout << max;
     return 0;
 }
