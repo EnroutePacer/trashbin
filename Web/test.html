@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>溯源 — RainViewer</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; background: #000; }
+    #map { width: 100%; height: 100%; }
+
+    .timeline {
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 1000; display: flex; align-items: center; gap: 12px;
+      background: rgba(5, 25, 35, 0.85); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 20px;
+      padding: 6px 20px;
+    }
+    .timeline input[type="range"] {
+      -webkit-appearance: none; appearance: none;
+      width: 220px; height: 3px; border-radius: 3px;
+      background: rgba(85, 148, 176, 0.3);
+      outline: none; cursor: pointer;
+    }
+    .timeline input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #5594b0; cursor: pointer;
+      box-shadow: 0 0 6px rgba(85, 148, 176, 0.6);
+    }
+    .timeline .time-label {
+      color: #e0f0f5; font-size: 0.85rem; font-weight: bold;
+      font-family: "Palatino Linotype", Palatino, serif;
+      white-space: nowrap; min-width: 100px; text-align: center;
+    }
+
+    .status {
+      position: absolute; top: 12px; left: 12px; z-index: 1000;
+      color: #8ea8b5; font-family: "Palatino Linotype", Palatino, serif;
+      font-size: 0.85rem; background: rgba(5, 25, 35, 0.75);
+      backdrop-filter: blur(8px); padding: 6px 14px; border-radius: 6px;
+    }
+
+    .vapor-tooltip {
+      position: absolute; z-index: 1500;
+      background: rgba(5, 25, 35, 0.9); backdrop-filter: blur(12px);
+      border: 1px solid rgba(85, 148, 176, 0.45); border-radius: 8px;
+      padding: 8px 16px; color: #e0f0f5;
+      font-family: "Palatino Linotype", Palatino, serif;
+      font-size: 0.85rem; pointer-events: none;
+      opacity: 0;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      clip-path: inset(100% 0 0 0);
+      transform: translate(-50%, 10px);
+      transition: opacity 0.3s, clip-path 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .vapor-tooltip.visible { 
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+      transform: translate(-50%, 0);
+    }
+    .vapor-tooltip .ocean-name { color: #7cc8f0; font-weight: bold; }
+
+    .loading-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 2000; background: rgba(0,0,0,0.7);
+      display: flex; align-items: center; justify-content: center;
+      color: #e0f0f5; font-family: "Palatino Linotype", Palatino, serif;
+      font-size: 1.2rem; transition: opacity 0.5s;
+    }
+
+    /* 隐藏默认鼠标 */
+    body, #map {
+      cursor: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="spotlight-overlay" style="position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 1200; pointer-events: none; mix-blend-mode: color-dodge; background: radial-gradient(circle at var(--mouse-x, -1000px) var(--mouse-y, -1000px), rgba(184, 216, 251, 0.5) 0px, rgba(168, 210, 254, 0.15) 25px, transparent 140px);"></div>
+  <canvas id="mist-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:1400; pointer-events:none; mix-blend-mode: screen;"></canvas>
+  <canvas id="cursor-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:1600; pointer-events:none;"></canvas>
+
+  <div class="loading-overlay" id="loading-overlay">
+    <div style="text-align:center">
+      <div style="font-size:2rem;margin-bottom:8px">🌧️</div>
+      <div>Loading...</div>
+    </div>
+  </div>
+
+  <div class="status" id="status" style="display:none">RainViewer</div>
+
+  <div class="vapor-tooltip" id="vapor-tooltip">
+    Steam from <span class="ocean-name"></span>
+  </div>
+
+  <div class="timeline" id="timeline" style="display:none">
+    <input type="range" id="frame-slider" min="0" max="0" value="0" />
+    <div class="time-label" id="time-label">--:-- UTC</div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    (async () => {
+      // --- 地图 ---
+      const map = L.map("map", {
+        center: [20, 0], zoom: 2,
+        worldCopyJump: true, zoomControl: false
+      });
+
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
+        { subdomains: "abcd", maxZoom: 19,
+          attribution: '&copy; OSM | CartoDB' }
+      ).addTo(map);
+
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/only_labels/{z}/{x}/{y}.png",
+        { subdomains: "abcd", maxZoom: 19, opacity: 0.3, errorTileUrl: '' }
+      ).addTo(map);
+
+      // --- 获取 RainViewer 数据 ---
+      let frames = [];
+      try {
+        const data = await fetch("https://api.rainviewer.com/public/weather-maps.json")
+          .then(r => r.json());
+        frames = data.radar.past || [];
+        window.__rvHost = data.host;
+      } catch (e) {
+        document.getElementById("loading-overlay").innerHTML =
+          '<div style="text-align:center;color:#ff6b6b">❌ 无法获取雷达数据<br><span style="font-size:0.8rem">请检查网络连接</span></div>';
+        return;
+      }
+
+      if (frames.length === 0) {
+        document.getElementById("loading-overlay").innerHTML =
+          '<div style="text-align:center">⚠️ 暂无雷达数据</div>';
+        return;
+      }
+
+      // 隐藏加载遮罩
+      document.getElementById("loading-overlay").style.opacity = "0";
+      setTimeout(() => {
+        const el = document.getElementById("loading-overlay");
+        if (el) el.remove();
+      }, 600);
+
+      document.getElementById("status").style.display = "block";
+      document.getElementById("timeline").style.display = "flex";
+
+      // --- 状态 ---
+      let currentIdx = frames.length - 1;  // 默认停在最新帧
+      let radarLayer = null;
+
+      const slider  = document.getElementById("frame-slider");
+      const timeLabel = document.getElementById("time-label");
+
+      slider.max = frames.length - 1;
+
+      function fmt(ts) {
+        const d = new Date(ts * 1000);
+        const hh = String(d.getUTCHours()).padStart(2, "0");
+        const mm = String(d.getUTCMinutes()).padStart(2, "0");
+        const M  = String(d.getUTCMonth() + 1).padStart(2, "0");
+        const dd = String(d.getUTCDate()).padStart(2, "0");
+        return { time: `${hh}:${mm} UTC`, dateStr: `${M}-${dd}` };
+      }
+
+      function showFrame(idx) {
+        if (radarLayer) map.removeLayer(radarLayer);
+        const f = frames[idx];
+        currentIdx = idx;
+        slider.value = idx;
+
+        const { time, dateStr } = fmt(f.time);
+        timeLabel.textContent = `${time}  ${dateStr}`;
+
+        // 512 瓦片 = 2x 精度，去马赛克。不设 tileSize，Leaflet 按 256px 布局
+        // updateWhenZooming 防止缩放时瓦片消失
+        radarLayer = L.tileLayer(
+          `${window.__rvHost}${f.path}/512/{z}/{x}/{y}/2/1_1.png`,
+          {
+            transparent: true,
+            opacity: 0.65,
+            crossOrigin: true,
+            updateWhenZooming: false,
+            keepBuffer: 8
+          }
+        ).addTo(map);
+      }
+
+      slider.addEventListener("input", () => showFrame(+slider.value));
+
+      // 键盘 ← → 逐帧，空格键播放/暂停
+      let playing = false;
+      let playTimer = null;
+      document.addEventListener("keydown", e => {
+        if (e.key === "ArrowLeft"  && currentIdx > 0) showFrame(currentIdx - 1);
+        if (e.key === "ArrowRight" && currentIdx < frames.length - 1) showFrame(currentIdx + 1);
+        if (e.key === " ") {
+          e.preventDefault();
+          playing = !playing;
+          if (playing) {
+            playTimer = setInterval(() => {
+              let next = (currentIdx + 1) % frames.length;
+              showFrame(next);
+            }, 600);
+          } else {
+            clearInterval(playTimer);
+          }
+        }
+      });
+
+      // 初始显示最新帧
+      showFrame(currentIdx);
+
+      // ==================== 降水区域 hover 水汽溯源 ====================
+
+      // 大洋区域划分
+      const OCEANS = [
+        { names: ['太平洋', 'Pacific'],    lat: [-60, 65], lng: [-180,  -70] },
+        { names: ['太平洋', 'Pacific'],    lat: [-60, 65], lng: [ 120,  180] },
+        { names: ['大西洋', 'Atlantic'],   lat: [-60, 65], lng: [ -70,   20] },
+        { names: ['印度洋', 'Indian'],     lat: [ -40, 30], lng: [  20,  120] },
+        { names: ['南大洋', 'Southern'],   lat: [ -90,-45], lng: [-180,  180] },
+        { names: ['北冰洋', 'Arctic'],     lat: [  65, 90], lng: [-180,  180] }
+      ];
+
+      function getOcean(lat, lng) {
+        for (const o of OCEANS) {
+          if (lat >= o.lat[0] && lat <= o.lat[1] &&
+              lng >= o.lng[0] && lng <= o.lng[1]) return o;
+        }
+        return null;
+      }
+
+      // 纬度 → 瓦片 Y 坐标
+      function latToTileY(lat, z) {
+        const n = Math.pow(2, z);
+        const r = Math.tan(lat * Math.PI / 180);
+        return n * (1 - Math.log(r + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2;
+      }
+
+      // 当前雷达帧瓦片的 URL 前缀 & zoom-aware 像素采样缓存
+      let sampleCache = { url: null, imgData: null, lastZ: -1 };
+
+      /**
+       * 采样指定经纬度在当前雷达瓦片上的像素 alpha 值
+       * > 0 表示该点有降水回波
+       */
+      async function samplePrecipAlpha(lat, lng) {
+        const z = Math.min(map.getZoom(), 10);  // 不超过 z=10，避免瓦片太小
+        const x = Math.floor((lng + 180) / 360 * Math.pow(2, z));
+        const y = Math.floor(latToTileY(lat, z));
+        const f = frames[currentIdx];
+        const tileUrl = `${window.__rvHost}${f.path}/512/${z}/${x}/${y}/2/1_1.png`;
+
+        // 命中缓存则跳过重新加载，整张瓦片只绘制并获取一次像素数据
+        if (sampleCache.url !== tileUrl || sampleCache.lastZ !== z) {
+          sampleCache.url = tileUrl;
+          sampleCache.lastZ = z;
+          sampleCache.imgData = null;
+          try {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            await new Promise((resolve, reject) => {
+              img.onload = resolve;
+              img.onerror = reject;
+              img.src = tileUrl;
+            });
+            const c = document.createElement("canvas");
+            c.width = img.width; c.height = img.height;
+            const ctx = c.getContext("2d", { willReadFrequently: true });
+            ctx.drawImage(img, 0, 0);
+            sampleCache.imgData = ctx.getImageData(0, 0, img.width, img.height);
+          } catch (e) {
+            return 0;
+          }
+        }
+
+        const data = sampleCache.imgData;
+        if (!data || !data.width) return 0;
+
+        // 计算瓦片内像素坐标
+        const n = Math.pow(2, z);
+        const px = Math.floor(((lng + 180) / 360 * n - x) * 512);
+        const py = Math.floor((latToTileY(lat, z) - y) * 512);
+
+        if (px < 0 || px >= data.width || py < 0 || py >= data.height) return 0;
+
+        const idx = (py * data.width + px) * 4;
+        return data.data[idx + 3] / 255;  // alpha 0~1
+      }
+
+      // ========== 动画：雾化追踪绘制与工具提示延迟 ==========
+
+      const mapContainer = map.getContainer();
+      const tooltip = document.getElementById("vapor-tooltip");
+      const oceanSpan = tooltip.querySelector(".ocean-name");
+      
+      const mistCanvas = document.getElementById("mist-canvas");
+      const mistCtx = mistCanvas.getContext("2d");
+
+      // ========== 动画：独立光标轨迹 ==========
+      const cursorCanvas = document.getElementById("cursor-canvas");
+      const cursorCtx = cursorCanvas.getContext("2d");
+      const cursorTrail = []; // 光标的平滑拖尾记录
+
+      // 创建独立的脱机遮罩画布，用于正确合并多个轨迹点
+      const maskCanvas = document.createElement("canvas");
+      const maskCtx = maskCanvas.getContext("2d");
+      
+      function resizeCanvas() {
+        mistCanvas.width = window.innerWidth;
+        mistCanvas.height = window.innerHeight;
+        maskCanvas.width = window.innerWidth;
+        maskCanvas.height = window.innerHeight;
+        cursorCanvas.width = window.innerWidth;
+        cursorCanvas.height = window.innerHeight;
+      }
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      let mouseX = -1000, mouseY = -1000;
+      let isRainingLocally = false;
+      let currentOcean = null;
+      let mistProgress = 0; // 取值 0.0 到 1.0
+      let tooltipAccumulator = 0; // 独立记录 hover 时间，满 1000ms 出字
+      
+      const mouseTrail = []; // 保存拖动轨迹
+      const TRAIL_DURATION = 1500; // 轨迹消散时间
+
+      const currentPos = { x: -1000, y: -1000 };
+      const targetPos = { x: -1000, y: -1000 };
+      let isMapDragging = false;
+
+      const spotlightOverlay = document.getElementById("spotlight-overlay");
+
+      map.on("dragstart", () => { isMapDragging = true; });
+      map.on("dragend", () => { 
+        isMapDragging = false; 
+        cursorTrail.length = 0; // 拖曳结束后清空旧轨迹
+      });
+      
+      mapContainer.addEventListener("mousemove", async (e) => {
+        // 使用 Leaflet api，保证鼠标坐标正确映射，不引发 offsetX 的漂移问题
+        const cp = map.mouseEventToContainerPoint(e);
+        mouseX = cp.x;
+        mouseY = cp.y;
+        targetPos.x = e.clientX;
+        targetPos.y = e.clientY;
+        
+        const latlng = map.containerPointToLatLng(cp);
+        const ocean = getOcean(latlng.lat, latlng.lng);
+
+        if (!ocean) {
+          isRainingLocally = false;
+          currentOcean = null;
+          return;
+        }
+
+        const alpha = await samplePrecipAlpha(latlng.lat, latlng.lng);
+        isRainingLocally = (alpha > 0.04);
+        currentOcean = isRainingLocally ? ocean : null;
+      });
+
+      mapContainer.addEventListener("mouseleave", () => {
+        isRainingLocally = false;
+        targetPos.x = -1000;
+        targetPos.y = -1000;
+        spotlightOverlay.style.setProperty('--mouse-x', '-1000px');
+        spotlightOverlay.style.setProperty('--mouse-y', '-1000px');
+      });
+
+      let lastTime = performance.now();
+      function animateMist(time) {
+        const dt = Math.min(time - lastTime, 30);
+        lastTime = time;
+
+        if (isRainingLocally && currentOcean) {
+          mistProgress = Math.min(1.0, mistProgress + dt / 2400); // 约 2.4 秒达到全亮（原 0.8s）
+          tooltipAccumulator += dt;
+        } else {
+          mistProgress = Math.max(0.0, mistProgress - dt / 1200); // 约 1.2 秒内自然消散（原 0.4s）
+          tooltipAccumulator = 0;
+        }
+
+        // ====== 解决问题2：纯净清场 ======
+        // 彻底清空整个画布，放弃过去的增量渐变累积，彻底避免任何浅白斑残留块！
+        mistCtx.clearRect(0, 0, mistCanvas.width, mistCanvas.height);
+
+        // 收集更新当前轨迹点
+        if (isRainingLocally && currentOcean) {
+          mouseTrail.push({ x: mouseX, y: mouseY, time });
+        }
+        // 清理过期的轨迹点
+        while (mouseTrail.length > 0 && time - mouseTrail[0].time > TRAIL_DURATION) {
+          mouseTrail.shift();
+        }
+
+        if ((mistProgress > 0 || mouseTrail.length > 0) && radarLayer) {
+          // ====== 解决问题1：完全契合真实降水形态 ======
+          
+          // 步骤 A: 将当前雷达瓦片提取至隐形画布上（我们从而得到了云层的绝对真实边界不规则形状）
+          mistCtx.globalCompositeOperation = "source-over";
+          const tiles = radarLayer.getContainer().querySelectorAll('img');
+          for (let img of tiles) {
+            const rect = img.getBoundingClientRect();
+            mistCtx.drawImage(img, rect.left, rect.top, rect.width, rect.height);
+          }
+
+          // 步骤 B (source-in): 将原先多彩降水像素变幻为云雾的白蓝色。
+          // 原先没有雨的透明像素部分将依然保持透明！它完全契合你的需求。
+          mistCtx.globalCompositeOperation = "source-in";
+          mistCtx.fillStyle = "rgba(225, 240, 255, 0.70)"; 
+          mistCtx.fillRect(0, 0, mistCanvas.width, mistCanvas.height);
+
+          // 步骤 C : 在独立的脱机画布生成轨迹圆形的**并集**。防止遮罩互相抵消消失！
+          maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+          maskCtx.globalCompositeOperation = "source-over";
+          
+          for (let pt of mouseTrail) {
+            let age = time - pt.time;
+            let intensity = Math.max(0, 1 - (age / TRAIL_DURATION)); // 残留强度衰减
+            // 结合整体的展示进度以及时间的消退
+            let localProg = mistProgress * intensity; 
+            if (localProg <= 0) continue;
+            
+            const baseRadius = localProg * 140;
+            const radius = Math.max(0.1, baseRadius + Math.sin((time - pt.time) / 200) * 8 * localProg);
+            
+            const grad = maskCtx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, radius);
+            // 渐变柔和化：降低中心遮罩的最高不透明度，增加过渡的平滑节点
+            grad.addColorStop(0, `rgba(255, 255, 255, ${Math.min(0.8, localProg * 0.8)})`);
+            grad.addColorStop(0.3, `rgba(255, 255, 255, ${Math.min(0.5, localProg * 0.5)})`);
+            grad.addColorStop(0.7, `rgba(255, 255, 255, ${Math.min(0.15, localProg * 0.15)})`);
+            grad.addColorStop(1, "rgba(255, 255, 255, 0)");
+            
+            maskCtx.fillStyle = grad;
+            maskCtx.beginPath();
+            maskCtx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);
+            maskCtx.fill();
+          }
+
+          // 步骤 D (destination-in): 用完整的轨迹并集画布重新裁切主画布上的云雾。
+          mistCtx.globalCompositeOperation = "destination-in";
+          mistCtx.drawImage(maskCanvas, 0, 0);
+        }
+
+        // 处理提示标签的渐显
+        if (tooltipAccumulator >= 1000 && currentOcean) {
+          if (!tooltip.classList.contains("visible")) {
+            oceanSpan.textContent = currentOcean.names[0];
+            // 移除可能残留的内联样式
+            tooltip.style.opacity = "";
+            tooltip.style.clipPath = "";
+            
+            // 文字出现在鼠标正上方并水平居中，稍微调高一点距离
+            tooltip.style.left = mouseX + "px";
+            tooltip.style.top  = (mouseY - 60) + "px";
+            tooltip.classList.add("visible");
+          } else {
+            // 文字已经出现时跟随鼠标
+            tooltip.style.left = mouseX + "px";
+            tooltip.style.top  = (mouseY - 60) + "px";
+          }
+        } else {
+          tooltip.classList.remove("visible");
+        }
+
+        // ====================== 绘制丝滑浅蓝色光标与拖尾 ======================
+        cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
+        
+        if (targetPos.x > 0) {
+          if (currentPos.x === -1000) {
+            currentPos.x = targetPos.x;
+            currentPos.y = targetPos.y;
+          }
+          
+          // 平滑插值 (Lerp)，制造顺滑跟随感
+          currentPos.x += (targetPos.x - currentPos.x) * 0.3;
+          currentPos.y += (targetPos.y - currentPos.y) * 0.3;
+          
+          // 更新纯 CSS 探照灯居中于平滑坐标，制造物理顺滑拖拽感
+          spotlightOverlay.style.setProperty('--mouse-x', currentPos.x + 'px');
+          spotlightOverlay.style.setProperty('--mouse-y', currentPos.y + 'px');
+
+          if (!isMapDragging) {
+            cursorTrail.push({ x: currentPos.x, y: currentPos.y, time });
+          } else {
+            cursorTrail.length = 0; // 拖曳时立即清除轨迹遗留
+            // 拖拽时消除平滑延迟，让圆环紧紧咬合光标
+            currentPos.x = targetPos.x;
+            currentPos.y = targetPos.y;
+          }
+
+          while (cursorTrail.length > 0 && time - cursorTrail[0].time > 400) {
+            cursorTrail.shift();
+          }
+
+          // 绘制光标拖尾轨迹
+          if (cursorTrail.length > 1) {
+            cursorCtx.lineWidth = 4;
+            cursorCtx.lineCap = "round";
+            cursorCtx.lineJoin = "round";
+            
+            // 分段绘制二次贝塞尔曲线以实现透明度渐变
+            for (let i = 1; i < cursorTrail.length; i++) {
+              cursorCtx.beginPath();
+              
+              const p0 = cursorTrail[i - 1];
+              const p1 = cursorTrail[i];
+              
+              if (i === 1) {
+                cursorCtx.moveTo(p0.x, p0.y);
+              } else {
+                const pPrev = cursorTrail[i - 2];
+                const prevXc = (p0.x + pPrev.x) / 2;
+                const prevYc = (p0.y + pPrev.y) / 2;
+                cursorCtx.moveTo(prevXc, prevYc);
+              }
+              
+              const xc = (p1.x + p0.x) / 2;
+              const yc = (p1.y + p0.y) / 2;
+              cursorCtx.quadraticCurveTo(p0.x, p0.y, xc, yc);
+              
+              if (i === cursorTrail.length - 1) {
+                cursorCtx.lineTo(p1.x, p1.y);
+              }
+              
+              // 越老的点 i 越小，取值越接近 0 (透明)；越接近当前鼠标 i 越大，透明度靠近 0.4
+              const ratio = i / cursorTrail.length;
+              // 你也可以加上 Math.pow(ratio, 1.5) 这样的指数函数让渐隐显得更“长”一点
+              cursorCtx.strokeStyle = `rgba(124, 200, 240, ${Math.pow(ratio, 1.2) * 0.45})`;
+              cursorCtx.stroke();
+            }
+          }
+
+          // 绘制鼠标主体：浅蓝色小圆环
+          cursorCtx.beginPath();
+          cursorCtx.arc(targetPos.x, targetPos.y, 6, 0, Math.PI * 2);
+          cursorCtx.strokeStyle = "rgba(124, 200, 240, 0.9)";
+          cursorCtx.lineWidth = 1.5;
+          cursorCtx.stroke();
+
+          // 可选：圆环中心的极小圆点
+          cursorCtx.beginPath();
+          cursorCtx.arc(targetPos.x, targetPos.y, 1.5, 0, Math.PI * 2);
+          cursorCtx.fillStyle = "rgba(220, 240, 255, 0.9)";
+          cursorCtx.fill();
+        }
+
+        requestAnimationFrame(animateMist);
+      }
+      requestAnimationFrame(animateMist);
+    })();
+  </script>
+</body>
+</html>

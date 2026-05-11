@@ -1,13 +1,26 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vite</title>
-  </head>
-  <body>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>渊海微澜 - The Profound Ocean</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      (function() {
+        var theme = localStorage.getItem('siteTheme');
+        if (theme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+        var lang = localStorage.getItem('siteLang');
+        if (lang) {
+          document.documentElement.lang = lang;
+        }
+      })();
+    </script>
+</head>
+<body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
-  </body>
+</body>
 </html>
